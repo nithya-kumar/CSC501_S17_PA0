@@ -1,0 +1,60 @@
+1. Assuming the XINU text begins at address 0x0, draw a rough diagram of XINU's memory layout with addresses derived from your experimental measurements. Include the information you uncovered from running your version of printsegaddress() and printprocstks().
+
+----------------- base 0x00ffdffc
+stack (length 4096)
+|
+|
+|
+|
+------------------ limit 0x00ffeff8
+heap
+------------------ end 0x00019858
+bss
+------------------ edata 0x0000bd60
+data
+------------------ etext 0x0000958e
+text
+------------------ 0x0
+
+2. What is the difference in stack top address before and after calling printtos() ? Draw a diagram to illustrate what are the contents of the items pushed into the stack between these two time points.
+
+Difference in stack top address before and after calling printtos() - 8 bytes 
+Before - 0x00ffefc0, After - 0x00ffefb8
+
+local variable
+---------------------
+ebp
+---------------------
+return address
+---------------------
+esp
+
+3. Which byte order is adopted in the host machine that we are using ? How did you find out ?
+
+The host machine adopts little-endian byte order. Ran a simple program to check in which order a hex value is stored in memory.
+
+#include <stdio.h>
+int main ()
+{
+  unsigned int xval = 0x12345678;
+  char *cval = (char*) &xval;
+
+  printf ("*cval is: 0x%x\n", *cval);
+  if (*cval == 0x78)
+  {
+    printf ("Little Endian\n");
+  }
+  return 0;
+}
+
+4. Briefly describe the mov, push, pusha, pop, and popa instructions in the x86.
+
+mov - move instruction copies data from one memory address to another address. Generally source is given as the second argument, destination is given as the first argument.
+push - push instruction decrements the stack pointer and loads the argument data in the stack pointer location.
+pop - pop instruction pops the data stored in the stack pointer location and stores in the argument, and then increments the stack pointer.
+pusha - pusha instruction pushes all general purpose registers onto the stack in the order AX,CX,DX,BX,SP,BP,SI,DI.
+popa - popa instruction pops all general purpose registers out of the stack in the order DI,SI,BP,SP,BX,DX,CX,AX.
+
+5. In a stack frame, local variables are stored below the top of the stack. In task 3, does your result show all the local variables declared in your printtos function? If not, can you explain that? (hint: try to disable the compiler optimization by specifing -O0 in your Makefile)
+
+No, the local variables declared by me are not shown in the result of printtos function. After disabling the compiler optimization in the Makefile, the variables were shown. The reason for this should be that the variables are moved on to registers during compiler optimization.
